@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema QR de Objetos Perdidos | Institución Educativa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#2e7d32', // Verde institucional
+                            600: '#1b5e20',
+                            700: '#14532d',
+                        },
+                        pinkAccent: {
+                            100: '#fce4ec',
+                            500: '#e91e63',
+                            600: '#c2185b',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Camera Scanner Frame Animation */
+        @keyframes scan {
+            0% { top: 5%; }
+            50% { top: 90%; }
+            100% { top: 5%; }
+        }
+        .scan-line {
+            position: absolute;
+            width: 90%;
+            height: 3px;
+            background: #e91e63;
+            box-shadow: 0 0 12px #e91e63, 0 0 4px #e91e63;
+            animation: scan 2.5s infinite ease-in-out;
+            left: 5%;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-50 bg-brand-500 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Title -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-white text-brand-500 p-2 rounded-lg shadow-sm flex items-center justify-center">
+                        <i class="fa-solid fa-qrcode text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight sm:text-xl">Sistema QR de Objetos Perdidos</h1>
+                        <p class="text-xs text-brand-100 font-medium">Proyecto Escolar - Institución Educativa</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav Buttons -->
+                <nav class="hidden md:flex items-center gap-2">
+                    <a href="#beneficios" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-brand-600 transition">Beneficios</a>
+                    <a href="#escaner" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-brand-600 transition">Escanear QR</a>
+                    <a href="#generador-qr" class="px-3 py-2 rounded-md text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition shadow-sm"><i class="fa-solid fa-qrcode mr-1"></i> Generar QR</a>
+                    <a href="#catalogo" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-brand-600 transition">Catálogo Digital</a>
+                    <a href="#registro" class="px-3 py-2 rounded-md text-sm font-medium bg-pinkAccent-500 hover:bg-pinkAccent-600 text-white shadow-sm transition">Registrar Objeto</a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md hover:bg-brand-600 focus:outline-none" aria-label="Abrir menú">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-brand-600 border-t border-brand-700 px-4 pt-2 pb-4 space-y-1">
+            <a href="#beneficios" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-brand-700">Beneficios</a>
+            <a href="#escaner" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-brand-700">Escanear QR</a>
+            <a href="#generador-qr" class="block px-3 py-2 rounded-md text-base font-medium bg-emerald-700 text-white">Generar QR para Salón</a>
+            <a href="#catalogo" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-brand-700">Catálogo Digital</a>
+            <a href="#registro" class="block px-3 py-2 rounded-md text-base font-medium bg-pinkAccent-500 text-white text-center mt-2">Registrar Objeto</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 flex-grow w-full">
+
+        <!-- Hero / Project Context Banner -->
+        <section class="bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-2xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+            <div class="relative z-10 max-w-3xl">
+                <span class="inline-block bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+                    Taller de Innovación Escolar
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold mb-4 leading-tight">
+                    Recupera tus pertenencias de forma rápida, sencilla y organizada
+                </h2>
+                <p class="text-brand-100 text-sm sm:text-base mb-6 leading-relaxed">
+                    A través de códigos QR ubicados en cada salón y puntos estratégicos del colegio, cualquier estudiante puede consultar el registro digital e identificar sus objetos perdidos sin tener que revisar todo manualmente.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <a href="#escaner" class="inline-flex items-center gap-2 bg-pinkAccent-500 hover:bg-pinkAccent-600 text-white font-semibold px-5 py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-camera"></i> Probar Escáner QR
+                    </a>
+                    <a href="#catalogo" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-3 rounded-xl backdrop-blur-sm transition">
+                        <i class="fa-solid fa-boxes-stacked"></i> Ver Objetos Encontrados
+                    </a>
+                </div>
+            </div>
+            <!-- Decorative Background Patterns -->
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none">
+                <i class="fa-solid fa-qrcode text-[240px]"></i>
+            </div>
+        </section>
+
+        <!-- 1. SECCIÓN DE BENEFICIOS (3 PILARES) -->
+        <section id="beneficios" class="scroll-mt-20">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-star text-pinkAccent-500"></i> Beneficios de la Propuesta
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-base mt-2">
+                    Un impacto positivo para toda la comunidad educativa promoviendo el orden, la responsabilidad y el cuidado colectivo.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Para los Estudiantes -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-emerald-100 text-brand-500 rounded-xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-slate-800 mb-2">Para los Estudiantes</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Ayuda a disminuir significativamente la cantidad de objetos perdidos definitivamente. Tienen un lugar organizado donde buscar sus pertenencias y devolverlas a sus dueños de forma más rápida.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-brand-500 flex items-center gap-1">
+                        <i class="fa-solid fa-check-circle"></i> Búsqueda práctica desde el celular
+                    </div>
+                </div>
+
+                <!-- Para el Colegio -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-slate-800 mb-2">Para el Colegio</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Mantiene los objetos perdidos organizados en un punto físico centralizado, evitando que se acumulen en diferentes partes del colegio o se traspapelen en las aulas.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-blue-600 flex items-center gap-1">
+                        <i class="fa-solid fa-check-circle"></i> Espacios limpios y ordenados
+                    </div>
+                </div>
+
+                <!-- Para las Familias -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-pinkAccent-100 text-pinkAccent-500 rounded-xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-people-roof"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-slate-800 mb-2">Para las Familias</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Fomenta la responsabilidad y el cuidado de los útiles personales en los estudiantes. Además, reduce costos familiares ya que recuperar un objeto evita gastar en comprar uno nuevo.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-pinkAccent-500 flex items-center gap-1">
+                        <i class="fa-solid fa-check-circle"></i> Ahorro económico y valores
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. SIMULACIÓN INTERACTIVA DE CÁMARA / ESCÁNER QR -->
+        <section id="escaner" class="scroll-mt-20 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Left Details -->
+                <div class="lg:col-span-6 space-y-4">
+                    <div class="inline-flex items-center gap-2 text-xs font-semibold text-pinkAccent-500 bg-pinkAccent-100 px-3 py-1 rounded-full">
+                        <i class="fa-solid fa-mobile-screen-button"></i> Tecnología Práctica
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 leading-snug">
+                        Escáner de Código QR Escolar
+                    </h2>
+                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                        Cada salón o zona física cuenta con una etiqueta/sticker con su código QR representativo de <strong class="text-slate-800">8 x 8 cm</strong> (sobre un rótulo impreso de 20 x 15 cm) con la leyenda:
+                    </p>
+                    
+                    <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl">
+                        <p class="font-semibold text-amber-900 text-sm sm:text-base italic">
+                            "¿Perdiste algo? Consulta aquí"
+                        </p>
+                        <p class="text-xs text-amber-700 mt-1">
+                            Apunta con la cámara de tu celular al código QR de tu salón para acceder inmediatamente al inventario digital.
+                        </p>
+                    </div>
+
+                    <div class="pt-2">
+                        <button id="btn-scan" onclick="startQRScanSim()" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3.5 rounded-xl shadow-md transition active:scale-95">
+                            <i class="fa-solid fa-camera text-lg"></i>
+                            <span>Simular Lectura de Código QR</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Visual Phone Simulator -->
+                <div class="lg:col-span-6 flex justify-center">
+                    <div class="relative w-full max-w-[280px] sm:max-w-[320px] bg-slate-900 rounded-[36px] p-4 shadow-2xl border-4 border-slate-800">
+                        <!-- Camera Notch -->
+                        <div class="w-32 h-4 bg-slate-800 rounded-b-xl mx-auto mb-3 flex items-center justify-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-slate-900"></div>
+                            <div class="w-3 h-1 rounded-full bg-slate-700"></div>
+                        </div>
+
+                        <!-- Screen Content -->
+                        <div id="phone-screen" class="relative bg-slate-800 rounded-[24px] h-[360px] sm:h-[400px] overflow-hidden flex flex-col items-center justify-center p-4 text-center">
+                            
+                            <!-- State 1: Idle Mock QR Label -->
+                            <div id="scanner-idle" class="flex flex-col items-center space-y-3">
+                                <div class="bg-white p-4 rounded-2xl shadow-md border-2 border-brand-500">
+                                    <svg class="w-32 h-32 text-slate-800" viewBox="0 0 100 100" fill="currentColor">
+                                        <!-- QR Symbol Representation -->
+                                        <rect x="10" y="10" width="25" height="25" rx="3" fill="#2e7d32"/>
+                                        <rect x="15" y="15" width="15" height="15" fill="#ffffff"/>
+                                        <rect x="18" y="18" width="9" height="9" fill="#2e7d32"/>
+
+                                        <rect x="65" y="10" width="25" height="25" rx="3" fill="#2e7d32"/>
+                                        <rect x="70" y="15" width="15" height="15" fill="#ffffff"/>
+                                        <rect x="73" y="18" width="9" height="9" fill="#2e7d32"/>
+
+                                        <rect x="10" y="65" width="25" height="25" rx="3" fill="#2e7d32"/>
+                                        <rect x="15" y="70" width="15" height="15" fill="#ffffff"/>
+                                        <rect x="18" y="73" width="9" height="9" fill="#2e7d32"/>
+
+                                        <rect x="45" y="10" width="10" height="10" fill="#333"/>
+                                        <rect x="45" y="25" width="10" height="20" fill="#333"/>
+                                        <rect x="10" y="45" width="25" height="10" fill="#333"/>
+                                        <rect x="45" y="55" width="20" height="10" fill="#333"/>
+                                        <rect x="70" y="45" width="20" height="20" fill="#333"/>
+                                        <rect x="65" y="75" width="25" height="15" fill="#333"/>
+                                    </svg>
+                                </div>
+                                <div class="text-white">
+                                    <span class="bg-pinkAccent-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Salón 702</span>
+                                    <p class="text-xs font-semibold text-slate-200 mt-1">¿Perdiste algo? Consulta aquí</p>
+                                    <p class="text-[11px] text-slate-400">Haz clic en el botón para escanear</p>
+                                </div>
+                            </div>
+
+                            <!-- State 2: Active Scanning Viewport -->
+                            <div id="scanner-active" class="hidden absolute inset-0 bg-slate-950 flex flex-col items-center justify-center p-4">
+                                <div class="relative w-48 h-48 border-2 border-brand-500 rounded-xl flex items-center justify-center overflow-hidden">
+                                    <div class="scan-line"></div>
+                                    <i class="fa-solid fa-qrcode text-6xl text-brand-500 opacity-40"></i>
+                                </div>
+                                <p class="text-xs font-medium text-emerald-400 mt-4 animate-pulse">Escaneando código del salón...</p>
+                            </div>
+
+                            <!-- State 3: Scan Success -->
+                            <div id="scanner-success" class="hidden flex flex-col items-center space-y-3 animate-fade-in">
+                                <div class="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center text-2xl shadow-lg">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <h4 class="text-white font-bold text-sm">¡Código Validado!</h4>
+                                <p class="text-slate-300 text-xs">Accediendo a Objetos Encontrados del colegio...</p>
+                            </div>
+
+                        </div>
+
+                        <!-- Home Bar -->
+                        <div class="w-24 h-1 bg-slate-700 rounded-full mx-auto mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.5 GENERADOR Y DESCARGADOR DE CÓDIGOS QR PARA IMPRIMIR -->
+        <section id="generador-qr" class="scroll-mt-20 bg-gradient-to-br from-emerald-50 to-slate-100 rounded-2xl p-6 sm:p-8 border border-emerald-200 shadow-sm">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="text-center max-w-2xl mx-auto">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 bg-brand-100 px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-print"></i> Herramienta para Profesores y Coordinadores
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Generador de Rótulo y Código QR</h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Crea el código QR para pegarlo en cualquier salón. Puedes usar el enlace de esta página o escribir una URL personalizada para redirigir directamente a la comunidad educativa.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-md">
+                    <!-- Form Controls for Generating QR -->
+                    <div class="md:col-span-6 space-y-4">
+                        <div>
+                            <label for="qr-label-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Ubicación / Nombre del Salón
+                            </label>
+                            <input type="text" id="qr-label-input" value="Salón 702" oninput="updateQRCode()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                        </div>
+
+                        <div>
+                            <label for="qr-url-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Enlace de Destino (URL de la Página)
+                            </label>
+                            <input type="url" id="qr-url-input" value="" placeholder="https://..." oninput="updateQRCode()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                            <p class="text-[11px] text-slate-500 mt-1">Por defecto usa la dirección web de esta misma página.</p>
+                        </div>
+
+                        <div class="pt-2 flex flex-wrap gap-3">
+                            <button onclick="printQRPoster()" class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow transition">
+                                <i class="fa-solid fa-print"></i> Imprimir Rótulo (20x15cm)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Live Poster Preview Box -->
+                    <div class="md:col-span-6 flex justify-center">
+                        <div id="printable-poster" class="w-[240px] sm:w-[280px] bg-white border-4 border-brand-500 rounded-2xl p-4 shadow-lg text-center flex flex-col items-center justify-between space-y-3 relative overflow-hidden">
+                            <div class="w-full bg-brand-500 text-white py-1.5 px-3 rounded-lg font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-school"></i>
+                                <span>Institución Educativa</span>
+                            </div>
+
+                            <div class="space-y-0.5">
+                                <h3 id="poster-room-name" class="font-black text-slate-800 text-lg sm:text-xl uppercase tracking-tight">SALÓN 702</h3>
+                                <p class="text-[12px] font-extrabold text-pinkAccent-500 uppercase">¿PERDISTE ALGO? CONSULTA AQUÍ</p>
+                            </div>
+
+                            <!-- QR SVG Container -->
+                            <div class="p-2 bg-white rounded-xl border-2 border-slate-800 shadow-inner flex items-center justify-center">
+                                <img id="qr-image-display" src="" alt="Código QR Generado" class="w-32 h-32 sm:w-36 sm:h-36 object-contain">
+                            </div>
+
+                            <div class="text-[10px] text-slate-500 font-medium leading-tight">
+                                <p>Escanea con la cámara de tu celular</p>
+                                <p class="text-brand-700 font-bold">Tamaño QR: 8x8 cm | Cartel: 20x15 cm</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. CATÁLOGO / REGISTRO DIGITAL DE OBJETOS ENCONTRADOS -->
+        <section id="catalogo" class="scroll-mt-20 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-boxes-stacked text-brand-500"></i> Catálogo Digital de Objetos Encontrados
+                    </h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Consulta aquí las pertenencias guardadas en el punto físico organizador.
+                    </p>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="flex items-center gap-2">
+                    <label for="filter-category" class="text-xs font-semibold text-slate-500 uppercase">Filtrar:</label>
+                    <select id="filter-category" onchange="filterObjects()" class="bg-white border border-slate-300 text-slate-700 text-sm rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <option value="todos">Todos los objetos</option>
+                        <option value="chaqueta">Chaquetas / Uniforme</option>
+                        <option value="lonchera">Loncheras</option>
+                        <option value="cartuchera">Cartucheras / Lápices</option>
+                        <option value="cuaderno">Cuadernos / Libros</option>
+                        <option value="botella">Botellas / Termos</option>
+                        <option value="otro">Otros</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Grid of Cards -->
+            <div id="objects-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Objects dynamically rendered here -->
+            </div>
+
+            <!-- Empty State Notice -->
+            <div id="empty-state" class="hidden bg-white rounded-2xl p-8 text-center border border-slate-200">
+                <i class="fa-solid fa-magnifying-glass text-4xl text-slate-300 mb-3"></i>
+                <p class="text-slate-600 font-medium">No se encontraron objetos registrados en esta categoría.</p>
+            </div>
+        </section>
+
+        <!-- 4. FORMULARIO INTERACTIVO PARA REGISTRAR OBJETOS ENCONTRADOS -->
+        <section id="registro" class="scroll-mt-20 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+            <div class="max-w-2xl">
+                <div class="inline-flex items-center gap-2 text-xs font-semibold text-brand-700 bg-brand-100 px-3 py-1 rounded-full mb-3">
+                    <i class="fa-solid fa-plus"></i> Formulario Estudiantil
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">
+                    Registrar Objeto Encontrado
+                </h2>
+                <p class="text-slate-600 text-sm mt-1 mb-6">
+                    ¿Encontraste una pertenencia en algún salón o patio? Completa este sencillo registro para publicarla de inmediato en el catálogo digital.
+                </p>
+
+                <form id="add-object-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Type of Object -->
+                        <div>
+                            <label for="object-type" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Tipo de Objeto *
+                            </label>
+                            <select id="object-type" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                                <option value="" disabled selected>Selecciona una opción...</option>
+                                <option value="chaqueta">Chaqueta / Prenda de vestir</option>
+                                <option value="lonchera">Lonchera</option>
+                                <option value="cartuchera">Cartuchera / Lápices</option>
+                                <option value="cuaderno">Cuaderno / Libro</option>
+                                <option value="botella">Botella / Termo de agua</option>
+                                <option value="otro">Otro Objeto</option>
+                            </select>
+                        </div>
+
+                        <!-- Custom Name / Description -->
+                        <div>
+                            <label for="object-name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Nombre Breve o Detalle *
+                            </label>
+                            <input type="text" id="object-name" required placeholder="Ej. Chaqueta azul talla 12" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Location found -->
+                        <div>
+                            <label for="object-location" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Lugar de Hallazgo *
+                            </label>
+                            <input type="text" id="object-location" required placeholder="Ej. Salón 702, Cancha de fútbol..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                        </div>
+
+                        <!-- Date found -->
+                        <div>
+                            <label for="object-date" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Fecha de Hallazgo *
+                            </label>
+                            <input type="date" id="object-date" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                        </div>
+                    </div>
+
+                    <!-- Privacy Reminder Banner -->
+                    <div class="bg-slate-100 p-3 rounded-xl flex items-start gap-3 border border-slate-200">
+                        <i class="fa-solid fa-user-shield text-brand-500 mt-0.5"></i>
+                        <p class="text-xs text-slate-600 leading-tight">
+                            <strong>Recordatorio de Privacidad:</strong> No se solicitan ni guardan datos personales innecesarios del estudiante. Solo se guarda el tipo de objeto, el lugar y la fecha de hallazgo.
+                        </p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div>
+                        <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-pinkAccent-500 hover:bg-pinkAccent-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition active:scale-95">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Publicar en Catálogo Digital
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Feedback Message Box -->
+                <div id="form-feedback" class="hidden mt-4 p-4 rounded-xl text-sm font-medium"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER DE CRÉDITOS -->
+    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-6 text-center md:text-left">
+                <div>
+                    <h3 class="text-white font-bold text-lg">Sistema QR de Objetos Perdidos</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Proyecto de Innovación Escolar - Institución Educativa</p>
+                </div>
+                <!-- Student Credit Box -->
+                <div class="bg-slate-800/80 border border-slate-700/80 px-4 py-2.5 rounded-xl text-xs text-slate-300 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm">
+                        SA
+                    </div>
+                    <div>
+                        <p class="font-semibold text-white">Sara Alejandra Alvarado Junco</p>
+                        <p class="text-slate-400">Estudiante de Grado 702</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+                <p class="text-slate-500 text-center sm:text-left">
+                    <i class="fa-solid fa-shield-halved text-brand-500 mr-1"></i> Regla de Privacidad: "No guardar datos innecesarios: solo registrar objeto, lugar y fecha".
+                </p>
+                <p class="text-slate-500">
+                    &copy; Proyecto Escolar. Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Set default QR URL input to current page URL
+        document.getElementById('qr-url-input').value = window.location.href;
+
+        // Function to dynamically update QR Image and Poster text
+        function updateQRCode() {
+            const roomName = document.getElementById('qr-label-input').value.trim() || 'Salón Escolar';
+            let targetUrl = document.getElementById('qr-url-input').value.trim();
+
+            if (!targetUrl) {
+                targetUrl = window.location.href;
+            }
+
+            // Update room header in preview poster
+            document.getElementById('poster-room-name').innerText = roomName.toUpperCase();
+
+            // Generate QR Image using reliable QR server API
+            const encodedUrl = encodeURIComponent(targetUrl);
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodedUrl}&color=1b5e20`;
+
+            document.getElementById('qr-image-display').src = qrApiUrl;
+        }
+
+        // Function to trigger clean printing of the QR Poster
+        function printQRPoster() {
+            const roomName = document.getElementById('qr-label-input').value.trim() || 'Salón Escolar';
+            const qrImgSrc = document.getElementById('qr-image-display').src;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Rótulo QR - ${escapeHtml(roomName)}</title>
+                    <style>
+                        @page { size: A4 portrait; margin: 20mm; }
+                        body { font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 90vh; margin: 0; background: #fff; }
+                        .poster { width: 180mm; height: 130mm; border: 4px solid #1b5e20; border-radius: 16px; padding: 20px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; justify-between: space-between; align-items: center; }
+                        .header-banner { background: #1b5e20; color: white; width: 100%; padding: 8px 0; border-radius: 8px; font-weight: bold; font-size: 16pt; text-transform: uppercase; letter-spacing: 1px; }
+                        .room-title { font-size: 26pt; font-weight: 900; color: #1e293b; margin: 10px 0 0 0; text-transform: uppercase; }
+                        .sub-title { font-size: 14pt; font-weight: 800; color: #e91e63; margin: 0 0 10px 0; text-transform: uppercase; }
+                        .qr-box { border: 3px solid #0f172a; border-radius: 12px; padding: 10px; display: inline-block; }
+                        .qr-box img { width: 75mm; height: 75mm; }
+                        .footer-text { font-size: 10pt; color: #475569; margin-top: 8px; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class="poster">
+                        <div class="header-banner">Institución Educativa</div>
+                        <div>
+                            <h1 class="room-title">${escapeHtml(roomName)}</h1>
+                            <p class="sub-title">¿PERDISTE ALGO? CONSULTA AQUÍ</p>
+                        </div>
+                        <div class="qr-box">
+                            <img src="${qrImgSrc}" alt="Código QR">
+                        </div>
+                        <div class="footer-text">
+                            Apunta con la cámara de tu celular para consultar el catálogo digital de objetos perdidos.
+                        </div>
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                window.close();
+                            }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // Initial Mock Database based on handwritten notes categories
+        let objectsDatabase = [
+            {
+                id: 1,
+                type: 'chaqueta',
+                name: 'Chaqueta de uniforme escolar',
+                location: 'Cancha de baloncesto',
+                date: '2026-10-12',
+                icon: 'fa-shirt',
+                color: 'bg-blue-100 text-blue-600'
+            },
+            {
+                id: 2,
+                type: 'lonchera',
+                name: 'Lonchera térmica con estampado',
+                location: 'Salón 702',
+                date: '2026-10-13',
+                icon: 'fa-box-tissue',
+                color: 'bg-pink-100 text-pink-600'
+            },
+            {
+                id: 3,
+                type: 'cartuchera',
+                name: 'Cartuchera con lápices de colores',
+                location: 'Laboratorio de Ciencias',
+                date: '2026-10-14',
+                icon: 'fa-pen-ruler',
+                color: 'bg-emerald-100 text-emerald-600'
+            },
+            {
+                id: 4,
+                type: 'cuaderno',
+                name: 'Cuaderno cuadriculado de 100 hojas',
+                location: 'Biblioteca',
+                date: '2026-10-10',
+                icon: 'fa-book',
+                color: 'bg-purple-100 text-purple-600'
+            },
+            {
+                id: 5,
+                type: 'botella',
+                name: 'Botella de agua metálica roja',
+                location: 'Patio principal',
+                date: '2026-10-11',
+                icon: 'fa-bottle-water',
+                color: 'bg-amber-100 text-amber-600'
+            }
+        ];
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu on link click
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Set default date picker to today
+        document.getElementById('object-date').valueAsDate = new Date();
+
+        // Helper to format category icon & styling
+        function getCategoryMeta(type) {
+            switch (type) {
+                case 'chaqueta':
+                    return { icon: 'fa-shirt', color: 'bg-blue-100 text-blue-600', label: 'Chaqueta / Prenda' };
+                case 'lonchera':
+                    return { icon: 'fa-box-tissue', color: 'bg-pink-100 text-pink-600', label: 'Lonchera' };
+                case 'cartuchera':
+                    return { icon: 'fa-pen-ruler', color: 'bg-emerald-100 text-emerald-600', label: 'Cartuchera / Útiles' };
+                case 'cuaderno':
+                    return { icon: 'fa-book', color: 'bg-purple-100 text-purple-600', label: 'Cuaderno / Libro' };
+                case 'botella':
+                    return { icon: 'fa-bottle-water', color: 'bg-amber-100 text-amber-600', label: 'Botella / Termo' };
+                default:
+                    return { icon: 'fa-box', color: 'bg-slate-100 text-slate-600', label: 'Otro Objeto' };
+            }
+        }
+
+        // Render Cards into HTML Grid
+        function renderObjects(objectsToRender) {
+            const grid = document.getElementById('objects-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            grid.innerHTML = '';
+
+            if (objectsToRender.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            objectsToRender.forEach(obj => {
+                const meta = getCategoryMeta(obj.type);
+                
+                // Format date string
+                const dateParts = obj.date.split('-');
+                const formattedDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : obj.date;
+
+                const cardHTML = `
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <!-- Header with Category Tag and Icon -->
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg ${meta.color}">
+                                    <i class="fa-solid ${meta.icon}"></i> ${meta.label}
+                                </span>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-box-archive text-[10px]"></i> En Caja de Registro
+                                </span>
+                            </div>
+
+                            <!-- Object Title -->
+                            <h3 class="font-bold text-slate-800 text-base mb-3 leading-snug">
+                                ${escapeHtml(obj.name)}
+                            </h3>
+
+                            <!-- Metadata List -->
+                            <div class="space-y-1.5 text-xs text-slate-600">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-location-dot text-slate-400 w-4"></i>
+                                    <span><strong>Lugar:</strong> ${escapeHtml(obj.location)}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-calendar-day text-slate-400 w-4"></i>
+                                    <span><strong>Fecha:</strong> ${formattedDate}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Action Note -->
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                            <span>ID de Registro: #${obj.id}</span>
+                            <span class="text-brand-500 font-medium">Lugar Físico Organizado</span>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            });
+        }
+
+        // Filter Logic
+        function filterObjects() {
+            const filterValue = document.getElementById('filter-category').value;
+            if (filterValue === 'todos') {
+                renderObjects(objectsDatabase);
+            } else {
+                const filtered = objectsDatabase.filter(item => item.type === filterValue);
+                renderObjects(filtered);
+            }
+        }
+
+        // Form Submission Handler
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const type = document.getElementById('object-type').value;
+            const name = document.getElementById('object-name').value.trim();
+            const location = document.getElementById('object-location').value.trim();
+            const date = document.getElementById('object-date').value;
+
+            if (!type || !name || !location || !date) {
+                showFeedback('Por favor completa todos los campos obligatorios.', 'error');
+                return;
+            }
+
+            // Create new object entry
+            const newObject = {
+                id: Date.now().toString().slice(-4),
+                type: type,
+                name: name,
+                location: location,
+                date: date
+            };
+
+            // Add to state and re-render
+            objectsDatabase.unshift(newObject);
+            
+            // Reset filter to 'todos' to show the newly added item at top
+            document.getElementById('filter-category').value = 'todos';
+            renderObjects(objectsDatabase);
+
+            // Reset Form & Show Success Message
+            document.getElementById('add-object-form').reset();
+            document.getElementById('object-date').valueAsDate = new Date();
+
+            showFeedback('¡Objeto registrado con éxito! Ahora está publicado en el catálogo digital.', 'success');
+
+            // Scroll smoothly to catalog
+            setTimeout(() => {
+                document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' });
+            }, 1000);
+        }
+
+        // Helper Feedback Message Box
+        function showFeedback(message, status) {
+            const feedbackEl = document.getElementById('form-feedback');
+            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+            if (status === 'success') {
+                feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800', 'border', 'border-emerald-300');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> ${message}`;
+            } else {
+                feedbackEl.classList.add('bg-rose-100', 'text-rose-800', 'border', 'border-rose-300');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-2"></i> ${message}`;
+            }
+
+            setTimeout(() => {
+                feedbackEl.classList.add('hidden');
+            }, 4000);
+        }
+
+        // Simulated QR Camera Scanner Logic
+        function startQRScanSim() {
+            const idleView = document.getElementById('scanner-idle');
+            const activeView = document.getElementById('scanner-active');
+            const successView = document.getElementById('scanner-success');
+            const btnScan = document.getElementById('btn-scan');
+
+            btnScan.disabled = true;
+            btnScan.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // Step 1: Start Scanning Animation
+            idleView.classList.add('hidden');
+            activeView.classList.remove('hidden');
+
+            setTimeout(() => {
+                // Step 2: Show Success Checkmark
+                activeView.classList.add('hidden');
+                successView.classList.remove('hidden');
+
+                setTimeout(() => {
+                    // Step 3: Reset Screen and Scroll to Catalog
+                    successView.classList.add('hidden');
+                    idleView.classList.remove('hidden');
+
+                    btnScan.disabled = false;
+                    btnScan.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                    document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth' });
+                }, 1200);
+            }, 2000);
+        }
+
+        // Helper to escape HTML tags for basic security
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Initialize App on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderObjects(objectsDatabase);
+            updateQRCode(); // Generate initial QR Code on load
+        });
+    </script>
+</body>
+</html>
